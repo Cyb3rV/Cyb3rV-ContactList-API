@@ -10,10 +10,10 @@ import ContactForm from "@/components/ContactForm";
 import { ContactList } from "@/components/ContactList";
 
 
-export default function Home() {
+export default function AddContact() {
   return (
     <Container>
-        <ContactList/>
+        <ContactForm/>
     </Container>
   );
 }
