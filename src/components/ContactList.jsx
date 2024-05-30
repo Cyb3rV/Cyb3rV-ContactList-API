@@ -15,9 +15,9 @@ export function ContactList(){
                     <Button><Link href="/addcontact" className="text-decoration-none text-white">Add new contact</Link></Button>
                 </Col>
             </Row>
-            <Card>
+            <Card className={contactList.length === 0 ? "border-0" : ""}>
                 {contactList.map((contact,index) => (
-                        <ContactListItem key={index} index={index} contact={contact}/>
+                        <ContactListItem key={index} contact={contact} index={index}/>
                 ))}
             </Card>
             

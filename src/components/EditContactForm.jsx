@@ -4,8 +4,9 @@ import { Form, Container, Row, Col, Button } from "react-bootstrap";
 import ContactListContext from "./ContactListContext";
 import { useRouter } from "next/router";
 
-export default function ContactForm (){
+export default function EditContactForm (){
     const {contactList, contactListActions} = useContext(ContactListContext);
+    const {currentContact} = useContext(ContactListContext);
     const router = useRouter();
 
     const nameRef = useRef();
@@ -17,8 +18,8 @@ export default function ContactForm (){
         event.preventDefault();
 
         try{
-            await contactListActions({type: "add", payload:{
-
+            await contactListActions({type: "update", payload:{
+                index: currentContact.id,
                 actions: contactListActions,
                 contact: {
                     name: nameRef.current.value,
@@ -47,19 +48,19 @@ export default function ContactForm (){
                 <Form className="p-0" onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label>Full Name</Form.Label>
-                        <Form.Control placeholder="Full Name" required ref={nameRef}/>
+                        <Form.Control placeholder="Full Name" required ref={nameRef} defaultValue={currentContact.name}/>
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Email</Form.Label>
-                        <Form.Control type="email" placeholder="Enter email" required ref={emailRef}/>
+                        <Form.Control type="email" placeholder="Enter email" required ref={emailRef} defaultValue={currentContact.email}/>
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Phone</Form.Label>
-                        <Form.Control placeholder="Enter phone" required ref={phoneRef}/>
+                        <Form.Control placeholder="Enter phone" required ref={phoneRef} defaultValue={currentContact.phone}/>
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Address</Form.Label>
-                        <Form.Control placeholder="Enter address" required ref={addressRef}/>
+                        <Form.Control placeholder="Enter address" required ref={addressRef} defaultValue={currentContact.address}/>
                     </Form.Group>
                     <Button type="submit">Save</Button>
                 </Form>

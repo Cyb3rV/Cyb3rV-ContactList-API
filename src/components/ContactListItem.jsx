@@ -7,19 +7,30 @@ import { IoMdMail } from "react-icons/io";
 import { useContext, useEffect, useState } from "react";
 import ContactListContext from "./ContactListContext";
 import DeleteContactModal from "./DeleteContactModal";
+import { useRouter } from "next/router";
 
 
 
 export function ContactListItem({contact, index}){
-    // const {contactList, contactListActions} = useContext(ContactListContext);
+    const {contactList, contactListActions} = useContext(ContactListContext);
     const [showModal, setShowModal] = useState(false);
+    const {SetCurrentContact} = useContext(ContactListContext);
+    const router = useRouter();
+
 
 
     const showModalCallback = (show) => {
         setShowModal(show);
     }
 
+    const handleClickEdit = () => {
+        router.push("/editcontact");
+        SetCurrentContact(contactList[index]);
+
+    }
+
     const handleClickDelete = () => {
+
         setShowModal(true);
     };
 
@@ -37,7 +48,7 @@ export function ContactListItem({contact, index}){
                     <Col>
                         <h3>{contact.name}</h3>
                     </Col>
-                    <Col xs={1}>
+                    <Col xs={1} onClick={handleClickEdit}>
                         <FaPencil />
                     </Col>
                     <Col xs={1} onClick={handleClickDelete}>
@@ -69,7 +80,7 @@ export function ContactListItem({contact, index}){
                     </Col>
                 </Row>
                 
-                <DeleteContactModal show={showModal} showModalCallback={showModalCallback} index={index}/>
+                <DeleteContactModal show={showModal} showModalCallback={showModalCallback} index={contact.id}/>
             </Container>
         </Container>
     )

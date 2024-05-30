@@ -2,60 +2,59 @@ const { useState, createContext, useReducer, useEffect } = require("react");
 
 const ContactListContext = createContext(null);
 
-const addContact = (contact) => {
-  console.log("crear usuario");
+const addContact = (info) => {
+  console.log("agregando contacto");
   fetch('https://playground.4geeks.com/contact/agendas/Cyb3rV/contacts', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
       },
-      body: JSON.stringify(
-          // slug: "Cyb3rV",
-          // contacts: [contact] // Asegúrate de que contact sea un objeto que represente un contacto
-          contact
-          )
+      body: JSON.stringify(info.contact)
   })
   .then(response => response.json())
   .then(data => {
       console.log(data);
+      LoadData(info.actions);
   })
   .catch(error => {
       console.log('Error:', error);
   });
 };
-
-
-function ContactListReducer(state, action){
-    
-    switch(action.type){
-        case "add":
-            addContact(action.payload);
-            return [...state, action.payload];
-        case "remove":
-            const index = action.payload;
-              
-            if (index < 0 || index >= state.length) {
-              console.warn('Índice fuera de límites');
-              return state;
-            }
-              
-            const newState = [...state];
-            newState.splice(index, 1);
-            return newState;
-        case "getData":
-          return ConsultData();
-        
-        default:
-            return;
-    }
-}
-// [{
-//   name: "Mike Anamendolla",
-//   address: "5842 HillCrest Rd",
-//   phone: "(870)288-4149",
-//   email: "mike.ana@example.com"
-// }]
-
+const removeContact = (info) => {
+  console.log("removiendo contacto");
+  fetch(`https://playground.4geeks.com/contact/agendas/Cyb3rV/contacts/${info.index}`, {
+      method: 'DELETE',
+      headers: {
+          'Content-Type': 'application/json',
+      }
+  })
+  .then(response => response.json().catch(() => ({})))  // Maneja respuestas vacías devolviendo un objeto vacío
+  .then(data => {
+      console.log(data);
+      LoadData(info.actions);
+  })
+  .catch(error => {
+      console.log('Error:', error);
+  });
+};
+const updateContact = (info) => {
+  console.log("agregando contacto");
+  fetch(`https://playground.4geeks.com/contact/agendas/Cyb3rV/contacts/${info.index}`, {
+      method: 'PUT',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(info.contact)
+  })
+  .then(response => response.json())
+  .then(data => {
+      console.log(data);
+      LoadData(info.actions);
+  })
+  .catch(error => {
+      console.log('Error:', error);
+  });
+};
 const CreateUser = () => {
   console.log("crear usuario");
   fetch ('https://playground.4geeks.com/contact/agendas/Cyb3rV',{
@@ -66,9 +65,7 @@ const CreateUser = () => {
   .then(data => console.log(data))
   .catch(error => console.log('Error:', error));
 };
-
-
-const LoadData = () => {
+const LoadData = (actions) => {
   console.log("Consultando datos");
   fetch ('https://playground.4geeks.com/contact/agendas/Cyb3rV')
   .then(response => {
@@ -83,16 +80,43 @@ const LoadData = () => {
     }
   })
   .then(data => {
-    console.log(data);
-    return data;
+    console.log(data.contacts);
+    actions({type: "setData", payload: data.contacts});
+    return data.contacts;
   })
   .catch(error => console.log('Error:', error));
 }
 
 
+function ContactListReducer(state, action){
+    
+    switch(action.type){
+        case "add":
+          addContact(action.payload);
+          return state;
+        case "remove":
+            removeContact(action.payload);
+            return state;
+        case "update":
+          updateContact(action.payload);
+          return state;
+
+        case "getData":
+          LoadData(action.payload);
+          return state;
+        case "setData":
+            console.log("enviando datos");
+            return action.payload;
+        
+        default:
+            return;
+    }
+}
+
 export function ContactListProvider({children}) {
     // const [contactsList, setContactList] = useState();
     const [contactList, contactListActions] = useReducer(ContactListReducer, []);
+    const [currentContact, SetCurrentContact] = useState({});
 
 
 
@@ -102,12 +126,12 @@ export function ContactListProvider({children}) {
     },[contactList])
 
     useEffect(() => {
-      LoadData();
+      contactListActions({type: "getData", payload: contactListActions});
     },[])
 
 
     return(
-        <ContactListContext.Provider value={{contactList, contactListActions}}>{children}</ContactListContext.Provider>
+        <ContactListContext.Provider value={{contactList, contactListActions, currentContact, SetCurrentContact}}>{children}</ContactListContext.Provider>
     )
 }
 

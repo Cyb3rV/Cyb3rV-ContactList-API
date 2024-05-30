@@ -6,8 +6,10 @@ export default function DeleteContactModal({show, showModalCallback, index}){
     const {contactListActions} = useContext(ContactListContext);
 
     const handleDeleteButton = () => {
-        console.log("test")
-        contactListActions({type: "remove", payload: index});
+        contactListActions({type:"remove", payload: {
+          actions: contactListActions,
+          index: index}
+      })
         showModalCallback(false)
     }
 
